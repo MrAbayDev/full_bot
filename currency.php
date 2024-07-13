@@ -11,8 +11,17 @@ class Currency {
     }
 
     public function getCurrencyInfo(): array {
-        $currencyInfo = file_get_contents(self::CB_URL);
-        return json_decode($currencyInfo, true);
+        $currencyInfo = @file_get_contents(self::CB_URL);
+        if ($currencyInfo === false) {
+            throw new Exception("Failed to fetch currency information.");
+        }
+
+        $data = json_decode($currencyInfo, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Error decoding currency data: " . json_last_error_msg());
+        }
+
+        return $data;
     }
 
     public function customCurrencies(): array {
